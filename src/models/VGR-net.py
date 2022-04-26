@@ -11,7 +11,7 @@ import torch.utils.data
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-from PReNet import PReNet
+from PreNet import PReNet
 
 def reparametrize(mu, logvar):
     std = logvar.div(2).exp()
