@@ -52,6 +52,7 @@ class EDNet(nn.Module):  # RNet + G
         R = self.decoder(z)
         return  R, mu,logvar, z
 
+# Expanded the architecture to produce high dimension output
 class Encoder(nn.Module):  # RNet
     def __init__(self, nc, nef, nz):
         super(Encoder, self).__init__()
@@ -64,10 +65,12 @@ class Encoder(nn.Module):  # RNet
             nn.ReLU(inplace=True),
             nn.Conv2d(nef * 4, nef * 8, 4, 2, 1, bias=False),
             nn.ReLU(inplace=True),
-            nn.Conv2d(nef*8, nef*16, 4, 1),
+            nn.Conv2d(nef * 8, nef * 16, 4, 2, 1, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(nef*16, nef*32, 4, 1),
             nn.ReLU(True),
-            View((-1, nef*16 * 1 * 1)),
-            nn.Linear(nef*16, nz* 2),
+            View((-1, nef*32 * 1 * 1)),
+            nn.Linear(nef*32, nz* 2),
         )
     def forward(self, input):
         distributions = self.main(input)
@@ -77,19 +80,25 @@ class Decoder(nn.Module):
     def __init__(self, nz, nef, nc):
         super(Decoder, self).__init__()
         self.main = nn.Sequential(
-            nn.Linear(nz, nef*16),
-            View((-1, nef*16, 1, 1)),
+            nn.Linear(nz, nef*32),
+            View((-1, nef*32, 1, 1)),
             nn.ReLU(True),
-            nn.ConvTranspose2d(nef*16, nef * 8, 4, 1, 0, bias=False),
+            nn.ConvTranspose2d(nef*32, nef * 16, 4, 1, bias=False),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(nef * 16, nef * 8, 4, 2, 1, bias=False),
             nn.ReLU(True),
             nn.ConvTranspose2d(nef * 8, nef * 4, 4, 2, 1, bias=False),
             nn.ReLU(True),
-            nn.ConvTranspose2d(nef * 4, nef * 2, 4, 2, 1, bias=False),
+            nn.ConvTranspose2d(nef * 4, nef*2, 4, 2, 1, bias=False),
             nn.ReLU(True),
-            nn.ConvTranspose2d(nef * 2, nef, 4, 2, 1, bias=False),
+            nn.ConvTranspose2d(nef*2, nef, 4, 2, 1, bias=False),
             nn.ReLU(True),
             nn.ConvTranspose2d(nef, nc, 4, 2, 1, bias=False),
-            nn.ReLU(True)
+            nn.ReLU(True),
+            nn.ConvTranspose2d(nc, nc, 4, 2, 1, bias=False),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(nc, nc, 4, 2, 1, bias=False),
+            nn.ReLU(True),
         )
     def forward(self, input):
         R = self.main(input)
