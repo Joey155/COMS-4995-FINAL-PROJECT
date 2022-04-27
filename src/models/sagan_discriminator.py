@@ -43,7 +43,7 @@ class Self_Attn(nn.Module):
 class Discriminator(nn.Module):
     """Discriminator, Auxiliary Classifier."""
 
-    def __init__(self, batch_size=64, image_size=64, conv_dim=64):
+    def __init__(self, batch_size=64, image_size=300, conv_dim=64):
         super(Discriminator, self).__init__()
         self.imsize = image_size
         layer1 = []
@@ -64,7 +64,7 @@ class Discriminator(nn.Module):
         layer3.append(nn.LeakyReLU(0.1))
         curr_dim = curr_dim * 2
 
-        if self.imsize == 64:
+        if self.imsize == 300:
             layer4 = []
             layer4.append(SpectralNorm(nn.Conv2d(curr_dim, curr_dim * 2, 4, 2, 1)))
             layer4.append(nn.LeakyReLU(0.1))
