@@ -75,12 +75,13 @@ class Discriminator(nn.Module):
         layer32.append(nn.LeakyReLU(0.1))
         curr_dim = curr_dim * 2
 
-        if self.imsize == 256:
-            layer4 = []
-            layer4.append(SpectralNorm(nn.Conv2d(curr_dim, curr_dim * 2, 4, 2, 1)))  # 4 *4
-            layer4.append(nn.LeakyReLU(0.1))
-            self.l4 = nn.Sequential(*layer4)     # 1* 1
-            curr_dim = curr_dim*2
+        
+        layer4 = []
+        layer4.append(SpectralNorm(nn.Conv2d(curr_dim, curr_dim * 2, 4, 2, 1)))  # 4 *4
+        layer4.append(nn.LeakyReLU(0.1))
+        self.l4 = nn.Sequential(*layer4)     # 1* 1
+        curr_dim = curr_dim*2
+        
         self.l1 = nn.Sequential(*layer1)
         self.l2 = nn.Sequential(*layer2)
         self.l3 = nn.Sequential(*layer3)
